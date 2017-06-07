@@ -22,7 +22,7 @@ struct Level{
 };
 
 typedef struct Student_Info{
-    char id[10];
+    char id[11];
     char name[10];
     int age;
     int classno;
@@ -51,7 +51,7 @@ int CheckID(char* s);
 int isUniqueID(char* s);
 void readData(Student *p);
 void InsertBefore();
-void CheckScore(float score);
+int CheckScore(float score);
 void showData(Student* p);
 Student* SearchFrontNode(Student* r);
 void DeleteNode(Student* r);
@@ -70,6 +70,12 @@ void Stat();
 void InsertAfter(Student* s);
 void FreeList(Student* p);
 Student* Sort(int (*cmp)(Student* a, Student* b, int k), int k);
+void level(Student *p);
+void WriteFile(FILE *fp, Student *p, int lastInfo);
+void ReadFile();
+void SaveToFile();
+void InsertToFile();
+void CopyFile();
 
 // 系统设置
 void SystemSet() {
@@ -90,8 +96,7 @@ Student* Init() {
     head->next = NULL;
 
     // 命令开关初始化
-    for (i = 1; i < 16; i++)
-    {
+    for (i = 1; i < 16; i++) {
         SWITCH[i] = 0;
     }
 
@@ -102,19 +107,31 @@ Student* Init() {
 
 // 管理员身份登录-界面
 void AdminInterface() {
-    printf("管理员，欢迎你！\n");
-    printf("【1】 初始化\n");
-    printf("【2】 录入数据\n");
-    printf("【3】 查找学号或姓名删除信息\n");
-    printf("【4】 打印全部学生信息\n");
-    printf("【5】 按姓名查找学生信息\n");
-    printf("【6】 计算所有学生的总分和平均分\n");
-    printf("【7】 插入一个学生信息到链表中\n");
-    printf("【8】 按总分排序并打印学生信息\n");
-    printf("【9】 按学号索引学生信息\n");
-    printf("【10】 分类汇总\n");
-    printf("【11】 退出\n");
-    printf("请输入命令编号: ");
+    printf("\n\n");
+    printf("\t\t\t                            管理员，欢迎你！\n");
+    printf("\t\t\t******************************************************************************\n");
+    printf("\t\t\t*                                                                            *\n");
+    printf("\t\t\t*                     1.  初始化                                             *\n");
+    printf("\t\t\t*                     2.  录入数据                                           *\n");
+    printf("\t\t\t*                     3.  查找学号或姓名删除信息                             *\n");
+    printf("\t\t\t*                     4.  打印全部学生信息                                   *\n");
+    printf("\t\t\t*                     5.  按姓名查找学生信息                                 *\n");
+    printf("\t\t\t*                     6.  计算所有学生的总分和平均分                         *\n");
+    printf("\t\t\t*                     7.  插入一个学生信息到链表中                           *\n");
+    printf("\t\t\t*                     8.  按总分排序并打印学生信息                           *\n");
+    printf("\t\t\t*                     9.  按学号索引学生信息                                 *\n");
+    printf("\t\t\t*                     10. 分类汇总                                           *\n");
+    printf("\t\t\t*                     11. 按等级百分比统计                                   *\n");
+    printf("\t\t\t*                     12. 写入文件                                           *\n");
+    printf("\t\t\t*                     13. 读取文件                                           *\n");
+    printf("\t\t\t*                     14. 退出                                               *\n");
+    printf("\t\t\t*                                                                            *\n");
+    printf("\t\t\t******************************************************************************\n");
+    printf("\n");
+    printf("\n");
+    printf("\n");
+    printf("\n");
+    printf("\t\t\t*****************Please Input your choice:");
 }
 // 返回用户界面
 void returnAdminFace() {
@@ -125,17 +142,27 @@ void returnAdminFace() {
 }
 //学生身份登录-界面
 void StudentInterface() {
-    printf("同学，你好\n");
-    printf("【1】 初始化\n");
-    printf("【2】 录入数据\n");
-    printf("【3】 打印全部学生信息\n");
-    printf("【4】 按姓名查找学生信息\n");
-    printf("【5】 计算所有学生的总分和平均分\n");
-    printf("【6】 按总分排序并打印学生信息\n");
-    printf("【7】 按学号索引学生信息\n");
-    printf("【8】 分类汇总\n");
-    printf("【9】 退出\n");
-    printf("请输入命令编号: ");
+    printf("\n\n");
+    printf("\t\t\t                               同学，你好\n");
+    printf("\t\t\t******************************************************************************\n");
+    printf("\t\t\t*                                                                            *\n");
+    printf("\t\t\t*                     1.  初始化                                             *\n");
+    printf("\t\t\t*                     2.  录入数据                                           *\n");
+    printf("\t\t\t*                     3.  打印全部学生信息                                   *\n");
+    printf("\t\t\t*                     4.  按姓名查找学生信息                                 *\n");
+    printf("\t\t\t*                     5.  计算所有学生的总分和平均分                         *\n");
+    printf("\t\t\t*                     6.  按总分排序并打印学生信息                           *\n");
+    printf("\t\t\t*                     7.  按学号索引学生信息                                 *\n");
+    printf("\t\t\t*                     8.  分类汇总                                           *\n");
+    printf("\t\t\t*                     9.  按等级百分比统计                                   *\n");
+    printf("\t\t\t*                     10. 退出                                               *\n");
+    printf("\t\t\t*                                                                            *\n");
+    printf("\t\t\t******************************************************************************\n");
+    printf("\n");
+    printf("\n");
+    printf("\n");
+    printf("\n");
+    printf("\t\t\t*****************Please Input your choice:");
 
 }
 // 返回用户界面
@@ -159,8 +186,7 @@ int CheckName (char *s) {
     if (strlen(s) == 0 || strlen(s) > NameLen)
         return 0;
 
-    for (i = 0; i < strlen(s); i++)
-    {
+    for (i = 0; i < strlen(s); i++) {
         if (!((s[i] >= 'a' && s[i] <= 'z') || (s[i] >= 'A' && s[i] <= 'Z')))
             return 0;
     }
@@ -173,8 +199,7 @@ int CheckID(char* s) {
 
     if (strlen(s) == 0 || strlen(s) > 10) return 0;
 
-    for (i = 0; i < strlen(s); i++)
-    {
+    for (i = 0; i < strlen(s); i++) {
         if (s[i] < '0' || s[i] > '9') return 0;
     }
 
@@ -193,7 +218,7 @@ int isUniqueID(char* s) {
 //输入链表，学生数目
 void nodeList() {
     int num;
-    printf("请输入学生的数目: \n");
+    printf("\t\t\t请输入学生的数目: \n");
     scanf("%d", &num);
 
     while (num--) {
@@ -207,84 +232,82 @@ void readData(Student *p) {
     int i;
     fflush(stdin);
 
-    printf("\n==请输入学生的学号== \n");
+    printf("\n\t\t\t==请输入学生的学号== \n");
+    printf("\t\t\t学号：");
     do {
         scanf("%s", p->id);
 
-        if (!CheckID(p->id))
-        {
-            printf("数据违法，请重新输入学号: ");
+        if (!CheckID(p->id)) {
+            printf("\t\t\t数据违法，请重新输入学号: ");
         }
-        else if (isUniqueID(p->id))
-        {
-            printf("已存在此学号，请重新输入: ");
+        else if (isUniqueID(p->id)) {
+            printf("\t\t\t已存在此学号，请重新输入: ");
         }
     }while (!(CheckID(p->id) && !isUniqueID(p->id)));
 
-
     fflush(stdin);
 
-    printf("\n==请输入学号为%s的学生信息== \n", p->id);
-    printf("姓名:");
+    printf("\n\t\t\t==请输入学号为%s的学生信息== \n", p->id);
+    printf("\t\t\t姓名:");
     scanf("%s", p->name);
     fflush(stdin);
 
-    printf("年龄: ");
+    printf("\t\t\t年龄: ");
     scanf("%d", &p->age);
     fflush(stdin);
 
-    printf("班级: ");
+    printf("\t\t\t班级: ");
     scanf("%d", &p->classno);
     for( ;p->classno < 1 || p->classno > 8 ; ){
-        printf("Input error!\n");
-        printf("请重新输入：");
+        fflush(stdin);
+        printf("\t\t\tInput error!\n");
+        printf("\t\t\t请重新输入：");
         scanf("%d", &p->classno);
     }
     fflush(stdin);
 
-    printf("数学: ");
-    scanf("%f", &p->score[0]);
-    CheckScore(p->score[0]);
-    fflush(stdin);
-
-    printf("C语言: ");
-    scanf("%f", &p->score[1]);
-    CheckScore(p->score[1]);
-    fflush(stdin);
-
-    printf("英语: ");
-    scanf("%f", &p->score[2]);
-    CheckScore(p->score[2]);
-    fflush(stdin);
+    for (int i = 0; i<3; i++) {
+        if (i == 0)
+            printf("\t\t\t数学: ");
+        else if(i == 1)
+            printf("\t\t\tC语言: ");
+        else if (i==2)
+            printf("\t\t\t英语: ");
+        do {
+            fflush(stdin);
+            scanf("%f", &p->score[i]);
+            if (!CheckScore(p->score[i])) {
+                printf("\t\t\t成绩为0-100！请重新输入");
+            }
+        } while (!CheckScore(p->score[i]));
+    }
 
     p->sum = -1;
     p->ave = -1;
 
 }
 
-void CheckScore(float score) {
-    for (;score< 0 || score > 100;){
-        printf("Input error!\n");
-        printf("请重新输入:");
-        scanf("%f",&score);
-    }
+int CheckScore(float score) {
+    if (score< 0 || score > 100)
+        return 0;
+    return 1;
 }
 
 void showData(Student* p) {
     int i;
 
     printf("\n");
-    printf("学号: %s\n", p->id);
-    printf("姓名: %s\n", p->name);
-    printf("年龄: %d\n", p->age);
-    printf("班级: %d\n", p->classno);
+    printf("\t\t\t学号: %s\n", p->id);
+    printf("\t\t\t姓名: %s\n", p->name);
+    printf("\t\t\t年龄: %d\n", p->age);
+    printf("\t\t\t班级: %d\n", p->classno);
 
-    printf("数学: %.2f\n", p->score[0]);
-    printf("C语言: %.2f\n", p->score[1]);
-    printf("英语: %.2f\n", p->score[2]);
+    printf("\t\t\t数学: %.2f\n", p->score[0]);
+    printf("\t\t\tC语言: %.2f\n", p->score[1]);
+    printf("\t\t\t英语: %.2f\n", p->score[2]);
 
-    if (SWITCH[8]) printf("总分: %.2f\n", p->sum);
-    if (SWITCH[8]) printf("平均分: %.2lf\n", p->ave);
+    if (SWITCH[8]) printf("\t\t\t总分: %.2f\n", p->sum);
+    if (SWITCH[8]) printf("\t\t\t平均分: %.2lf\n", p->ave);
 
 }
 
@@ -343,12 +366,12 @@ void SearchDeleteNode() {
     char sure[20];
 
     // 输入合法性判断
-    printf("请输入你要删除的学生的 姓名 或 学号: ");
+    printf("\t\t\t请输入你要删除的学生的 姓名 或 学号: ");
     do {
         gets(str);
 
         if (!(CheckID(str) || CheckName(str))) {
-            printf("数据违法，请重新输入姓名或学号: ");
+            printf("\t\t\t数据违法，请重新输入姓名或学号: ");
         }
     }
     while (!(CheckID(str) || CheckName(str)));
@@ -358,14 +381,14 @@ void SearchDeleteNode() {
         p = SearchID(str);
 
         if (p == NULL) {
-            printf("对不起，找不到这个学号\n");
+            printf("\t\t\t对不起，找不到这个学号\n");
         }
         else {
             showData(p);
-            printf("确认删除? (输入\"y\"确认，任意键取消): ");
+            printf("\t\t\t确认删除? (输入\"y\"确认，任意键取消): ");
             if (strcmp(gets(sure), "y") == 0) {
                 DeleteNode(p);
-                printf("删除成功\n");
+                printf("\t\t\t删除成功\n");
                 SWITCH[6] = 0;
             }
             fflush(stdin);
@@ -375,14 +398,14 @@ void SearchDeleteNode() {
         p = SearchName(str);
 
         if (p == NULL) {
-            printf("对不起，找不到这个姓名\n");
+            printf("\t\t\t对不起，找不到这个姓名\n");
         }
         else {
             showData(p);
-            printf("确认删除? (输入\"y\"确认，任意键取消): ");
+            printf("\t\t\t确认删除? (输入\"y\"确认，任意键取消): ");
             if (strcmp(gets(sure), "y") == 0) {
                 DeleteNode(p);
-                printf("删除成功!\n");
+                printf("\t\t\t删除成功!\n");
                 SWITCH[6] = 0;
             }
             fflush(stdin);
@@ -396,13 +419,11 @@ void OutList() {
     Student *p = head->next;
 
     // 空表处理
-    if (p == NULL)
-    {
-        printf("暂无学生信息!\n");
+    if (p == NULL) {
+        printf("\t\t\t暂无学生信息!\n");
     }
 
-    while (p != NULL)
-    {
+    while (p != NULL) {
         showData(p);
         p = p->next;
     }
@@ -416,11 +437,11 @@ void PrintName() {
     fflush(stdin);
 
     // 姓名合法性判断
-    printf("请输入你要查找的学生姓名: ");
+    printf("\t\t\t请输入你要查找的学生姓名: ");
     do {
         gets(name);
         if (!CheckName(name)) {
-            printf("数据违法，请重新输入姓名: ");
+            printf("\t\t\t数据违法，请重新输入姓名: ");
         }
     }
     while (!CheckName(name));
@@ -435,7 +456,7 @@ void PrintName() {
     }
 
     if (flag) {
-        printf("对不起，找不到这个姓名\n");
+        printf("\t\t\t对不起，找不到这个姓名\n");
     }
     returnUserFace();
 }
@@ -455,6 +476,53 @@ void Compute() {
             p->ave = sum * 1.0 / 3;
             p = p->next;
     }
+}
+
+// 计算等级百分比
+void level() {
+    Student *p = head->next;
+
+    struct Level subject[3]={0};
+    int num=0; //学生人数
+
+    while (p != NULL) {
+        num++;
+        for (int i = 0; i < 3; i++) {
+            if (p->score[i] >= 90 && p->score[i] <= 100) {
+                subject[i].Excellent++;
+            } else if (p->score[i] >= 80 && p->score[i] < 90) {
+                subject[i].Fine++;
+            } else if (p->score[i] >= 70 && p->score[i] < 80) {
+                subject[i].Medium++;
+            } else if (p->score[i] >= 60 && p->score[i] < 70) {
+                subject[i].Pass++;
+            } else {
+                subject[i].Failed++;
+            }
+        }
+        p = p->next;
+    }
+
+        for (int i = 0; i < 3; i++) {
+            switch (i) {
+                case 0:
+                    printf("\t\t\t数学: \n");
+                    break;
+                case 1:
+                    printf("C\t\t\t语言: \n");
+                    break;
+                case 2:
+                    printf("\t\t\t英语: \n");
+                    break;
+                default:
+                    break;
+            }
+            printf("\t\t\t优秀(90-100) %2d %-5.2f%%\n", subject[i].Excellent, 1.0 * subject[i].Excellent / num * 100);
+            printf("\t\t\t良好(80-89)  %2d %-5.2f%%\n", subject[i].Fine, 1.0 * subject[i].Fine / num * 100);
+            printf("\t\t\t中等(70-79)  %2d %-5.2f%%\n", subject[i].Medium, 1.0 * subject[i].Medium / num * 100);
+            printf("\t\t\t及格(60-69)  %2d %-5.2f%%\n", subject[i].Pass, 1.0 * subject[i].Pass / num * 100);
+            printf("\t\t\t不及格(0-59) %2d %-5.2f%%\n", subject[i].Failed, 1.0 * subject[i].Failed / num * 100);
+        }
 }
 
 // 比较学号
@@ -497,7 +565,7 @@ Student* Sort(int (*cmp)(Student* a, Student* b, int k), int k) {
         p = p->next;
     }
 
-    /* 表尾处理 */
+    // 表尾处理
     p->next = NULL;
     return newhead;
 }
@@ -519,7 +587,7 @@ void Stat() {
     Student *p = head->next;
 
     if (p == NULL) {
-        printf("暂无学生信息，无法统计\n");
+        printf("\t\t\t暂无学生信息，无法统计\n");
         return;
     }
 
@@ -535,35 +603,167 @@ void Stat() {
     // 各科分别输出
     for (i = 0; i < 3; i++) {
         if (i==0)
-            printf("数学");
-        if (i==1)
-            printf("C语言");
-        if (i==2)
-            printf("英语");
-        printf("总分: %.2f, 总均分: %.2lf\n", sum[i], sum[i] * 1.0 / n);
+            printf("\t\t\t数学");
+        else if (i==1)
+            printf("\t\t\tC语言");
+        else if (i==2)
+            printf("\t\t\t英语");
+        printf("\t\t\t总分: %.2f, 总均分: %.2lf\n", sum[i], sum[i] * 1.0 / n);
         head = Sort(CmpScore, i);
         j = 0;
         p = head->next;
 
         while (p != NULL) {
             j++;
-            printf("NO.%d %s %.2f\n", j, p->name, p->score[i]);
+            printf("\t\t\tNO %d %s %.2f\n", j, p->name, p->score[i]);
             p = p->next;
         }
         printf("\n");
     }
 }
 
-/* 比较各科分数 */
+// 比较各科分数
 int CmpScore(Student* a, Student* b, int k) {
     return b->score[k] - a->score[k];
 }
 
 // 释放链表
 void FreeList(Student* p) {
-    if (p->next != NULL)
-    {
+    if (p->next != NULL) {
         FreeList(p->next);
     }
     free(p);
+}
+
+void WriteFile(){
+    int num;
+
+    FILE *fp;
+    Student *p;
+    int lastInfo;
+    int i = 0, j;
+    char flag;
+    printf("\t\t\t请输入你要写入的文件： \n");
+    scanf("%d", &i);
+    switch (i) {
+        case 1:
+            printf("\t\t\t该文件不存在，是否要创建新文件？\n");
+            printf("\t\t\t输入\"n\"结束或者输入\"y\"继续\n");
+            scanf("%c", &flag);
+            if (flag == 'n') {
+                break;
+            } else if (flag == 'y') {
+                fp = fopen("class01.dat", "w");
+            }
+            break;
+        case 2:
+            fp = fopen("class02.dat", "a");
+            break;
+        case 3:
+            fp = fopen("class03.dat", "a");
+            break;
+        case 4:
+            fp = fopen("class04.dat", "a");
+            break;
+        case 5:
+            fp = fopen("class05.dat", "a");
+            break;
+        case 6:
+            printf("\t\t\t该文件不存在，是否要创建新文件？\n");
+            printf("\t\t\t输入\"n\"结束或者输入\"y\"继续\n");
+            scanf("%c", &flag);
+            if (flag == 'n') {
+                break;
+            } else if (flag == 'y') {
+                fp = fopen("class06.dat", "w");
+            }
+            break;
+        case 7:
+            fp = fopen("class07.dat", "a");
+            break;
+        default:
+            printf("\t\t\t请输入合法的班级名称\n");
+            break;
+    }
+
+    if (fp == NULL) {
+        printf("\t\t\t打开文件失败\n");
+        exit(0);
+    } else {
+        int i;
+        fprintf(fp, "%s\n", p->id);
+        fprintf(fp, "%s\n", p->name);
+        fprintf(fp, "%d\n", p->classno);
+        for (i=0; i<3; i++){
+            fprintf(fp, "%f\n", p->score[i]);
+        }
+        if (lastInfo) {
+            fprintf(fp, "%f\n", p->score[i]);
+        } else {
+            fprintf(fp, "%f", p->score[i]);
+        }
+        fclose(fp);
+        printf("\t\t\t写入成功\n");
+        returnUserFace();
+    }
+}
+
+// 追加记录到文件中
+void InsertToFile()
+{
+    tmp = LEN;
+    readData(tmp);
+    SWITCH[12] = 1;
+}
+void ReadFile() {
+    FILE *p;
+    int i = 0;
+    printf("\t\t\t请输入你要读取的文件: \n");
+    scanf("%d", &i);
+    switch (i) {
+        case 2:
+            p = fopen("class02.dat", "r");
+            break;
+        case 3:
+            p = fopen("class03.dat", "r");
+            break;
+        case 4:
+            p = fopen("class04.dat", "r");
+            break;
+        case 5:
+            p = fopen("class05.dat", "r");
+            break;
+        case 7:
+            p = fopen("class07.dat", "r");
+            break;
+        default:
+            printf("\t\t\t找不到该文件\n");
+            break;
+    }
+    if (p == NULL) {
+        printf("\t\t\t打开文件失败\n");
+        exit(0);
+    } else {
+        int num = 0;
+        Student *r = head->next;
+        while (r != NULL) {
+            num++;
+            fprintf(p, "%s %s ", r->id, r->name);
+            for (int j = 0; j < 3; j++) {
+                fprintf(p, "%.2f", r->score[j]);
+            }
+            fprintf(p, " %.2f %.2f", r->sum, (r->sum) / 3);
+            fprintf(p, "\n");
+
+            fscanf(p, "%s %s ", r->id, r->name);
+            printf("%s %s ", r->id, r->name);
+            for (int j = 0; j < 3; j++) {
+                printf("%.2f ", r->score[j]);
+            }
+            printf(" %.2f %.2f\n", r->sum, (r->sum) / 3);
+            r = r->next;
+        }
+    }
+        fclose(p);
+        returnUserFace();
 }
