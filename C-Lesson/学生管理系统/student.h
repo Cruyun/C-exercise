@@ -755,12 +755,19 @@ void ReadFile() {
             fprintf(p, " %.2f %.2f", r->sum, (r->sum) / 3);
             fprintf(p, "\n");
 
-            fscanf(p, "%s %s ", r->id, r->name);
-            printf("%s %s ", r->id, r->name);
+//            fscanf(p, "%s %s ", r->id, r->name);
+            printf("学号 %s 姓名 %s ", r->id, r->name);
+
             for (int j = 0; j < 3; j++) {
+                if (j==0)
+                    printf("数学 ");
+                else if (j==1)
+                    printf("C语言");
+                else if (j==2)
+                    printf("英语");
                 printf("%.2f ", r->score[j]);
             }
-            printf(" %.2f %.2f\n", r->sum, (r->sum) / 3);
+            printf(" 总分%.2f 平均分%.2f\n", r->sum, (r->sum) / 3);
             r = r->next;
         }
     }
