@@ -10,7 +10,7 @@ int main() {
         scanf("%d-%d %d", &team[i], &member, &score);
         a[team[i]]+=score;
     }
-    i = 0;
+
     max_team = team[0];
     max_score = a[team[0]];
 
