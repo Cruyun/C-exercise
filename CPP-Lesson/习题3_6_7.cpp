@@ -5,14 +5,16 @@
 using namespace std;
 
 
-int **Make2DArray(int m, int n)
+int ** Make2DArray(int m, int n)
 {
-    int ** dm, i, j;
+
+    int ** dm, i;
     dm = new int * [m];
 
     for (i = 0; i < m; i++)
         if ((dm[i] = new int [n]) == NULL)
-            exit(0);
+            exit(0); 
+			
     return dm;
 }
 
@@ -48,11 +50,16 @@ int main()
 
     d3 = Make2DArray(m,k);
 
+	 for (i = 0; i < m; i++)
+        for ( j = 0; j < k; j++)
+            for (p = 0; p < n; p++)
+                	d3[i][j]=0;
+
     for (i = 0; i < m; i++)
         for ( j = 0; j < k; j++)
             for (p = 0; p < n; p++)
                 d3[i][j]+=d1[i][p]*d2[p][j];
-
+			
     for (i = 0; i < m; i++) {
         for (j = 0; j < k; j++)
             cout << d3[i][j] << "\t";

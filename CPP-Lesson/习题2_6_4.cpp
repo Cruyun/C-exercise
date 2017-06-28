@@ -3,19 +3,22 @@
 
 using namespace std;
 
-int main ()
+template <class T>
+
+void fun(T n)
 {
-	int n;
-	int result(1), pre(1),result2(1),r(1);
+
+	T result(1), pre(1),result2(1),r(1);
 
 	cin >> n;
-	for (int i = 1; i <= n; i++)
+	for (int i = 2; i <= n; i++)
 	{
-		pre *= i;
-		result = pre * ( i + 1);
-		if (result < 0 && pre > 0) {
+		pre *= (i-1);
+		result *= i;
+		if ((result / i) != pre ){
 		result2 = pre;
 		r = i;
+		break;
 		}
 	}
 
@@ -24,5 +27,12 @@ int main ()
 			cout << result2 << endl;
 			cout << "Òç³öÇ°nÎª"<< r << endl;
 	}
+}
+int main ()
+{
+	fun<int>(32);
+	fun<long int>(32);
+	fun<short int>(32);
+	fun<char>(1000);
 	return 0;
 }

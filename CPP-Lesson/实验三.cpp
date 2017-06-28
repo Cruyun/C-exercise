@@ -14,10 +14,16 @@ private:
 	int H;
 	char *word;
 public:
-	Rectangle(int x=0, int y=0, int w=0, int h=0, char *str=NULL)
+	Rectangle(int x, int y=0, int w=0, int h=0, char *str=NULL)
 	{
 		X=x, Y=y, W=w, H=h;
-		word = str; 
+		if (str!= NULL)
+		{
+		word = new char[strlen(str)+1];
+		strcpy(word,str);
+		}
+		else
+			word = NULL;
 	}
 	Rectangle(Rectangle & p)
 	{
@@ -25,11 +31,17 @@ public:
 		Y = p.Y;
 		H = p.H;
 		W = p.W;
-		word = p.word;
+     	if (p.word!= NULL)
+		{
+		word = new char[strlen(p.word)+1];
+		strcpy(word,p.word);
+		}
+		else
+			word = NULL;
 	}
 	Rectangle()
 	{
-		X=0, Y=0, W=0, H=0;
+        X=0, Y=0, W=0, H=0;
 		word = NULL;
 	}
 	~Rectangle()
