@@ -20,23 +20,69 @@ void DestroyList(Sqlist * L);
 void ClearList(Sqlist * L);
 bool ListEmpty(Sqlist L);
 int ListLength(Sqlist L);
-bool GetElem(Sqlist L, int i, ElemType * e);
+void GetElem(Sqlist L, int i, ElemType * e);
 int LocateElem(Sqlist L, ElemType e);
-bool PriorElem(Sqlist L, ElemType cur_e, ElemType * pre_e);
-bool NextElem(Sqlist L, ElemType cur_e, ElemType * next_e);
+void PriorElem(Sqlist L, ElemType cur_e, ElemType * pre_e);
+void NextElem(Sqlist L, ElemType cur_e, ElemType * next_e);
 void ListInsert(Sqlist * L, int i, ElemType e);
 void ListDelete(Sqlist * L, int i, ElemType * e);
 void ListTraverse(Sqlist L); // 依次输出每个元素
+void unionList(Sqlist * La, Sqlist * Lb);
 
 int main() {
     Sqlist L;
-    InitList(&L, LIST_INIT_SIZE, LISTINCREMENT);
     L.len = 5;
+    InitList(&L, L.len, LISTINCREMENT);
+    cout << "----------" << endl;
     for (int i = 0; i < L.len; i++) {
         L.elem[i] = 0;
     }
+    for (int i = 1; i < 6; i++) {
+        ListInsert(&L, 1, i);
+    }
+    ListTraverse(L);
 
+    cout << "----------" << endl;
+    int next_e;
+    int pre_e;
+    PriorElem(L, 1, &pre_e);
+    NextElem(L, 4, &next_e);
 
+    cout << "----------" << endl;
+    ListEmpty(L);
+    ListLength(L);
+
+    cout << "----------" << endl;
+    int e;
+    GetElem(L, 2, &e);
+    LocateElem(L,2);
+    ListDelete(&L,2,&e);
+    cout << "----------" << endl;
+    cout << "the new list is:" << endl;
+    ListTraverse(L);
+    cout << "----------" << endl;
+    //ClearList(&L);
+    //LDestroyList(&L);
+
+    cout << "----------" << endl;
+    Sqlist B;
+    B.len = 5;
+    InitList(&B, B.len, LISTINCREMENT);
+    cout << "----------" << endl;
+    for (int i = 0; i < B.len; i++) {
+        B.elem[i] = 0;
+    }
+    for (int i = 7; i <= 11; i++) {
+        ListInsert(&B, 1, i);
+    }
+    ListTraverse(B);
+    unionList(&L, &B);
+    cout << "the new list A is:" << endl;
+    ListTraverse(L);
+
+    ClearList(&L);
+    DestroyList(&L);
+    return 0;
 }
 
 void InitList(Sqlist * L, int maxsize, int incresize) {
@@ -44,6 +90,7 @@ void InitList(Sqlist * L, int maxsize, int incresize) {
     L->len = 0;
     L->listsize = LIST_INIT_SIZE;
     L->incrementsize = LISTINCREMENT;
+    cout << "list init" << endl;
 }
 
 void DestroyList(Sqlist * L) {
@@ -51,6 +98,7 @@ void DestroyList(Sqlist * L) {
         delete[] L->elem;
         L->listsize = 0;
         L->len = 0;
+        cout << "list is destroyed" << endl;
     } else {
         cout << "Error: this list is not exit" << endl;
     }
@@ -62,68 +110,73 @@ void ClearList(Sqlist * L) {
             L->elem[i] = 0;
         }
         L->len = 0;
-        L->listsize = 0;
     } else {
         cout << "Error: this list is not exit" << endl;
     }
+    cout << "list clear" << endl;
 }
 
 bool ListEmpty(Sqlist L) {
-    if (L.listsize != 0) {
+    if (L.len != 0) {
+        cout << "this list is not empty" << endl;
         return true;
     }
+    cout << "this list is empty" << endl;
     return false;
 }
-
 int ListLength(Sqlist L) {
+    cout << "the length of this list is " << L.len << endl;
     return L.len;
 }
 
-bool GetElem(Sqlist L, int i, ElemType * e) {
+void GetElem(Sqlist L, int i, ElemType * e) {
     if (L.listsize != 0) {
         e = &L.elem[i];
-        return true;
+        cout << "the " << i+1 << " element is " << *e << endl;
+    } else {
+        cout << "error" << endl;
     }
-    return false;
 }
 
 int LocateElem(Sqlist L, ElemType e) {
+    int flag = 0;
     if (L.listsize != 0) {
         for (int i = 1; i <= L.len; i++) {
-            if (e == L.elem[i-1])
-                return i;
-            else
-                return 0;
+            if (e == L.elem[i-1]) {
+                cout << e << " is located at " << i << endl;
+                flag = 1;
+            }
+        }
+        if (!flag) {
+            cout << e << " is not exist" << endl;
         }
     }
-    return 0;
+    return flag;
 }
 
-bool PriorElem(Sqlist L, ElemType cur_e, ElemType * pre_e) {
+void PriorElem(Sqlist L, ElemType cur_e, ElemType * pre_e) {
     if (L.elem[0] != cur_e) {
         for (int i = 0; i < L.len; i++) {
             if (L.elem[i] == cur_e) {
                 pre_e = &L.elem[i - 1];
-                return true;
-            } else {
-                cout << "error" << endl;
-                return false;
+                cout << cur_e << " follows " << *pre_e << endl;
             }
         }
+    } else {
+        cout << "error" << endl;
     }
 }
 
-bool NextElem(Sqlist L, ElemType cur_e, ElemType * next_e){
+void NextElem(Sqlist L, ElemType cur_e, ElemType * next_e){
     if (L.elem[L.len-1] != cur_e) {
         for (int i = 0; i < L.len; i++) {
             if (L.elem[i] == cur_e) {
                 next_e = &L.elem[i + 1];
-                return true;
-            } else {
-                cout << "error" << endl;
-                return false;
+                cout << *next_e << " follows " << cur_e << endl;
             }
         }
+    }else {
+        cout << "error" << endl;
     }
 }
 
@@ -149,15 +202,25 @@ void ListDelete(Sqlist * L, int i, ElemType * e) {
                 L->elem[j - 1] = L->elem[j];
             }
         }
+        cout << "delete the " << i << " element which is " << *e << endl;
         L->len --;
     }
 }
 
 void ListTraverse(Sqlist L) {
+    cout << "traverse list's elememts:" << endl;
     for (int i = 0; i < L.len; i++) {
-        if (i != L.len - 1)
-            cout << L.elem[i] << " ";
-        else
-            cout << L.elem[i-1];
+        cout << "[" << i << "]: " << L.elem[i] << endl;
     }
+}
+
+void unionList(Sqlist * La, Sqlist * Lb) {
+    int la_len = ListLength(*La);
+    int e = 0;
+    while(ListEmpty(*Lb)) {
+        ListDelete(Lb, 1, &e);
+        if (!LocateElem(*La, e))
+            ListInsert(La, ++la_len, e);
+    }
+    DestroyList(Lb);
 }
