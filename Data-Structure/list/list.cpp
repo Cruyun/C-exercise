@@ -1,11 +1,10 @@
 //
 // Created by Cai Ruyun on 2017/9/12.
 //
-#include <iostream>
-using namespace std;
-
 #define LIST_INIT_SIZE 100
 #define LISTINCREMENT 10
+#include <iostream>
+using namespace std;
 
 typedef int ElemType;
 typedef struct {
@@ -14,76 +13,6 @@ typedef struct {
     int listsize;
     int incrementsize;
 } Sqlist;
-
-void InitList(Sqlist * L, int maxsize, int incresize);
-void DestroyList(Sqlist * L);
-void ClearList(Sqlist * L);
-bool ListEmpty(Sqlist L);
-int ListLength(Sqlist L);
-void GetElem(Sqlist L, int i, ElemType * e);
-int LocateElem(Sqlist L, ElemType e);
-void PriorElem(Sqlist L, ElemType cur_e, ElemType * pre_e);
-void NextElem(Sqlist L, ElemType cur_e, ElemType * next_e);
-void ListInsert(Sqlist * L, int i, ElemType e);
-void ListDelete(Sqlist * L, int i, ElemType * e);
-void ListTraverse(Sqlist L); // 依次输出每个元素
-void unionList(Sqlist * La, Sqlist * Lb);
-
-int main() {
-    Sqlist L;
-    L.len = 5;
-    InitList(&L, L.len, LISTINCREMENT);
-    cout << "----------" << endl;
-    for (int i = 0; i < L.len; i++) {
-        L.elem[i] = 0;
-    }
-    for (int i = 1; i < 6; i++) {
-        ListInsert(&L, 1, i);
-    }
-    ListTraverse(L);
-
-    cout << "----------" << endl;
-    int next_e;
-    int pre_e;
-    PriorElem(L, 1, &pre_e);
-    NextElem(L, 4, &next_e);
-
-    cout << "----------" << endl;
-    ListEmpty(L);
-    ListLength(L);
-
-    cout << "----------" << endl;
-    int e;
-    GetElem(L, 2, &e);
-    LocateElem(L,2);
-    ListDelete(&L,2,&e);
-    cout << "----------" << endl;
-    cout << "the new list is:" << endl;
-    ListTraverse(L);
-    cout << "----------" << endl;
-    //ClearList(&L);
-    //LDestroyList(&L);
-
-    cout << "----------" << endl;
-    Sqlist B;
-    B.len = 5;
-    InitList(&B, B.len, LISTINCREMENT);
-    cout << "----------" << endl;
-    for (int i = 0; i < B.len; i++) {
-        B.elem[i] = 0;
-    }
-    for (int i = 7; i <= 11; i++) {
-        ListInsert(&B, 1, i);
-    }
-    ListTraverse(B);
-    unionList(&L, &B);
-    cout << "the new list A is:" << endl;
-    ListTraverse(L);
-
-    ClearList(&L);
-    DestroyList(&L);
-    return 0;
-}
 
 void InitList(Sqlist * L, int maxsize, int incresize) {
     L->elem = new ElemType[maxsize];
