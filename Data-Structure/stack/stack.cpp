@@ -49,9 +49,10 @@ void Push(Stack *S, ElemType e) {
     p->data = e;
     p->next = S->next;
     S->next = p;
-    cout << "push data is " << S->next->data << endl;
+    //cout << "push data is " << S->next->data << endl;
     delete p;
 }
+
 ElemType Pop(Stack *S, ElemType &e) {
     if (S->next == NULL) {
         cout << "this stack is empty" << endl;
@@ -81,4 +82,53 @@ void StackTraverse(Stack *S) {
         S = S->next;
     }
     cout << endl;
+}
+
+bool OpMember(char ch) {
+    if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
+        return true;
+    else 
+        return false;
+}
+
+ElemType Operate(ElemType a, char ch, ElemType b) {
+    ElemType m = 0;
+    if (ch == '+') {
+        m = a + b;
+    } else if (ch == '-') {
+        m = a - b;
+    } else if (ch == '*') {
+        m = a * b;
+    } else if (ch == '/') {
+        m = a / b;
+    }
+    return m;
+}
+
+int evaluation(char suffix[ ])
+{
+    Node * S = new Node(0);
+    char ch;
+    int result;
+    ch = *suffix++;
+    ElemType a,b,c;
+    InitStack(S);
+    while(ch!= '#'){
+        if(!OpMember(ch)) {
+            c = ch -'0';
+            Push(S,c);
+        }
+        else{
+            //Pop(S,b);
+            //Pop(S,a);
+            b = Pop(S, b);
+            a = Pop(S, a);
+            Push(S,Operate(a,ch,b));
+        }
+        ch=*suffix++;
+    }
+    ElemType e;
+    result = Pop(S, e);
+    //Pop(S,result);
+    return result;
 }

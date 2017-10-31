@@ -20,5 +20,8 @@ void GetTop(Stack S, ElemType e);
 void Push(Stack *S, ElemType e);
 ElemType Pop(Stack *S, ElemType &e);
 void StackTraverse(Stack S);
+bool OpMember(char ch);
+int evaluation(char suffix[ ]);
+ElemType Operate(ElemType a, char ch, ElemType b);
 
 #endif

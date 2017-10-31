@@ -23,7 +23,7 @@ int main() {
     StackTraverse(S);
     int e1 = 3;
     int e2;
-   Push(S, e1);
+    Push(S, e1);
     StackTraverse(S);
     cout << "pop data is " << Pop(S, e2) << endl;
     StackTraverse(S);
@@ -32,6 +32,10 @@ int main() {
     cout << "this top data of this stack is " << GetTop(S, e2)<< endl;
     ClearStack(S);
     DestroyStack(S);
+
+    char suffix[10]={'0'};
+    cin >> suffix;
+    cout << "result is " << evaluation(suffix);
 
     return 0;
 }
