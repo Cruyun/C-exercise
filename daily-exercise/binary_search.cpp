@@ -23,6 +23,7 @@ int binary_search(const int arr[], int start, int end, int key)
     int mid;
     while (start <= end)
     {
+        mid = start + (end - start) / 2;
         if (arr[mid] < key)
         {
             start = mid + 1;
