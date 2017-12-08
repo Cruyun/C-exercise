@@ -37,9 +37,9 @@ typedef struct {
 const int vexnum = 9;
 const int arcnum = 8;
 VTable vTable[arcnum] = { {'A','B',32.8},{'A','H',12.1},{'B','C',5.9},{'C','D',21.3},
-                          {'C','E',41.1}, {'E','G',10.5}, {'F','I',79.2},{'H','I',8.7} };
+                          {'C','E',41.1}, {'E','G',10.5}, {'F','I',79.2},{'H','I',8.7}};
 
-VertexType vexTable[vexnum + 1] = {'A','B','C','D','E','F','G','H','I'};
+VertexType vexTable[vexnum] = {'A','B','C','D','E','F','G','H','I'};
 
 void CreateUDG(ALGraph &G, VTable *vTable, VertexType *vexTable) {
     VertexType v1, v2;
@@ -47,16 +47,14 @@ void CreateUDG(ALGraph &G, VTable *vTable, VertexType *vexTable) {
     G.vexnum = vexnum;
     G.arcnum = arcnum;
 
-    for (int i = 0; i < G.arcnum; ++i) {
+    for (int i = 0; i < G.vexnum; ++i) {
         G.vertices[i].data = vexTable[i];
         G.vertices[i].firstarc = NULL;
     }
 
     for (int k = 0; k < G.arcnum; ++k) {
         v1 = vTable[k].V1;
-        cout << "v1: " << v1 << endl;
         v2 = vTable[k].V2;
-        cout << "v2: " << v2 << endl;
         int i = vTable[k].V1 - 'A';
         int j = vTable[k].V2 - 'A';
 
@@ -76,7 +74,7 @@ bool visited[vexnum];
 
 void DFS(ALGraph &G, int i){
     visited[i] = true;
-    cout << i << ": " << G.vertices[i].data << " ";
+    cout << G.vertices[i].data << " ";
 
     ArcNode *p = G.vertices[i].firstarc;
 
@@ -84,7 +82,7 @@ void DFS(ALGraph &G, int i){
         if(!visited[p->adjvex]){
             DFS(G,p->adjvex);
         }
-        p= p->nextarc;
+        p = p->nextarc;
     }
 }
 
