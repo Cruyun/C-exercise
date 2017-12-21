@@ -46,8 +46,7 @@ VTable vTable[arcnum] = { {'A','B',32.8},{'A','C',44.6},{'A','H',12.1},{'A','I',
 
 VertexType vexTable[vexnum] = {'A','B','C','D','E','F','G','H','I'};
 
-void sort(Edge *eSet,int N)
-{
+void sort(Edge *eSet,int N) {
     int i = 0, j = 0;
     Edge t;
     for(i = 0;i < N - 1;i++) {
