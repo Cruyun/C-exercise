@@ -1,27 +1,29 @@
 #include <stdio.h>
 #include <string.h>
 int main() {
-    char A[1000];
+    char A[1005] = {'0'};
     int B;
-    int Q[1000];
-    int R;
-    int len,i;
-    int d,e;
+    int R = 0;
+    int len, i, d, e;
 
-    scanf("%s %d", A,&B);
-    len=strlen(A);
-    for (i = 0; i <len; i++) {
-        d=((A[i]-'0')*10 + (A[i+1]-'0'))/B;
-        R=((A[i]-'0')*10 + (A[i+1]-'0'))%B;
-        Q[i]=d;
-        A[i+1]=R+'0';
-        if(i==len-2)
-            break;
+    scanf("%s%d", A,&B);
+    len = strlen(A);
+
+    int Q[len];
+    for (i = 0; i < len; i++) {
+        Q[i] = (R * 10 + (A[i] - '0')) / B;
+        R = (R * 10 + (A[i] - '0')) % B;
     }
-
-    for(i=0;i<len-1;i++){
+    int start = 0;
+    for(i = 0; i < len; i++){
+        if(Q[i] != 0){
+            start = i;
+            break;
+        }
+    }
+    for(i = start; i < len; i++){
         printf("%d",Q[i]);
     }
-    printf(" %d",R);
+    printf(" %d\n",R);
     return 0;
 }
