@@ -97,7 +97,6 @@ void DFSTraverse(MGraph &G) {
         if (!visited[i])
             DFS(G, i);
     }
-
 }
 
 int main() {
