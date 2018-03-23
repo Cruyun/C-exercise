@@ -22,7 +22,7 @@ void decompressString(string s) {
     for (int i = 0; i < s.length(); i++) {
         int temp = 0;
         while (isdigit(s[i])) {
-             temp = temp * 10 + (s[i++] - '0');
+            temp = temp * 10 + (s[i++] - '0');
         }
         for (int j = 0; j < temp; ++j) {
             cout << s[i];
