@@ -1,4 +1,4 @@
-// 部分正确。。应该有可能并列的
+// 部分正确。应该要考虑是同一个人的情况，这个写法太复杂了
 
 #include <iostream>
 #include <cstdlib>
