@@ -1,6 +1,7 @@
 // 分治法求解最近点对问题
 #include <iostream>
 #include <cmath>
+#include <ctime>
 #include <algorithm>
 
 #define MIN 10000
@@ -11,8 +12,20 @@ struct point{
   int x, y;
 };
 
+void time_counter(double (*func)(point*, int, int), int *arr, int n, int m, string method);
+
 bool cmp (point a, point b) {
   return a.y > b.y;
+}
+
+void time_counter(double (*func)(point*, int, int), point *arr, int n, int m, string method) {
+  clock_t start, end;
+  start  = clock();
+  cout << "最近点对距离为" << func(arr, n, m) << endl;
+  end = clock();
+
+  double time_used = end - start;
+  cout << method << "用时" << time_used << endl;
 }
 
 double Distance(point a, point b) {
@@ -71,6 +84,8 @@ double Cloest(point S[], int low, int high) {
 }
 int main() {
   point S[10] = {{0, 0}, {1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}, {8, 8}, {9,9}};
-  cout << "min distance" << Cloest(S, 0, 9);
+  // cout << "min distance" << Cloest(S, 0, 9);
+  time_counter(Cloest, S, 0, 9, "分治法");
+
   return 0;
 }
