@@ -29,12 +29,14 @@ int CommonOrder(char x[], char y[], char z[])
       if (x[i] == y[j]) {
         L[i][j] = L[i - 1][j - 1] + 1;
         S[i][j] = 1;
-      } else if(L[i][j - 1] >= L[i - 1][j]) {
-          L[i][j] = L[i][j - 1];
-          S[i][j] = 2;
       } else {
-          L[i][j] = L[i - 1][j];
-          S[i][j] = 3;
+          if (L[i][j - 1] >= L[i - 1][j]) {
+              L[i][j] = L[i][j - 1];
+              S[i][j] = 2;
+          } else {
+              L[i][j] = L[i - 1][j];
+              S[i][j] = 3;
+          }
       }
       cout << "L " << L[i][j] << " S " << S[i][j] << endl;
     }
@@ -55,7 +57,7 @@ int CommonOrder(char x[], char y[], char z[])
     }
   }
 
-  for (k = 0; k < L[M][N]; k++) {
+  for (k = 1; k <= L[M][N]; k++) {
     cout << z[k] << endl;
   }
   return L[M][N];
