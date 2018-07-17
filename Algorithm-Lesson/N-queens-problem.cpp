@@ -4,7 +4,6 @@ using namespace std;
 void Queen();
 int Place(int k);
 
-
 const int N = 4;
 int x[N] = {-1};
 
