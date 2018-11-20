@@ -5,46 +5,49 @@
 #include <stdio.h>
 using namespace std;
 
-typedef struct process {
-    int jid;
-    int at; /* arrival time */
-    int bt; /* burst time */
-    int wt; /* wait time */
-    double rr; /* rate */
-    bool visited;
-    bool operator < (const process &a) const
-    {
-      return a.bt < bt;
-    }
-} process;
+typedef struct job {
+  int jid;
+  int at; /* arrival time */
+  int bt; /* burst time */
+  int wt; /* wait time */
+  double rr; /* rate */
+  bool visited;
+  bool operator < (const job &a) const
+  {
+    return a.bt < bt;
+  }
+} job;
 
-void FIFO(int n, vector<process> p);
-void SJF(int n, vector<process> p);
-void HRRN(int n, vector<process> p);
+void FIFO(int n, vector<job> p);
+void SJF(int n, vector<job> p);
+void HRRN(int n, vector<job> p);
 
 int main() {
-  vector<process> p(10);
-  int n; /* num of processes */
-  cout << "input the num of processes: ";
+  vector<job> p(10);
+  int n; /* num of jobs */
+  cout << "input the num of jobes: ";
   cin >> n;
   int i, j; /* count temp; */
 
-  cout << "input the info of process: no, arrival time, burst time, pivilege:" << endl;
+  cout << "input the info of job: no, arrival time, burst time, pivilege:" << endl;
   for (i = 0; i < n; i++) {
     cin >> p[i].jid >> p[i].at >> p[i].bt;
     p[i].wt = 0; /* init */
     p[i].rr = 0.0; /* init */
     p[i].visited = false;
   }
+  cout << "FIFO:" << endl;
   FIFO(n, p);
+  cout << "SJF:" << endl;
   SJF(n, p);
+  cout << "HRRN:" << endl;
   HRRN(n, p);
 
   return 0;
 }
 /**
-  * a: arrival time of process a
-    b: arrival time of process a
+  * a: arrival time of job a
+    b: arrival time of job a
   return time interval(minute)
 **/
 
@@ -59,7 +62,7 @@ int calculate(int at, int bt) {
   return h * 60 + m;
 }
 
-void FIFO(int n, vector<process> p) {
+void FIFO(int n, vector<job> p) {
   p[0].wt = 0;
   int i;
   // calculate wait time
@@ -87,34 +90,32 @@ int calcTime(int nowtime, int bt) {
 
 }
 
-void SJF(int n, vector<process> p) {
-  priority_queue<process> waitProcess;
-  process curRun;
+void SJF(int n, vector<job> p) {
+  priority_queue<job> waitjob;
+  job curRun;
   int nowtime = p[0].at;
-  waitProcess.push(p[0]);
+  waitjob.push(p[0]);
   p[0].visited = true;
 
   cout << "进程号  进入时间 运行时间  结束运行时间" << endl;
 
-  while (!waitProcess.empty()) {
-    curRun = waitProcess.top();
-    waitProcess.pop();
+  while (!waitjob.empty()) {
+    curRun = waitjob.top();
+    waitjob.pop();
     nowtime = calcTime(nowtime, curRun.bt);
 
-    cout << curRun.jid << "   " << curRun.at << " " << curRun.bt << "  " << nowtime  << endl;
-
-
+    cout << curRun.jid << "    " << curRun.at << "   " << curRun.bt << "    " << nowtime  << endl;
     for (int i = 0; i < n; i++) {
       if (p[i].at <= nowtime && !p[i].visited) {
-        waitProcess.push(p[i]);
+        waitjob.push(p[i]);
         p[i].visited = true;
       }
     }
 
-    if(waitProcess.empty()) {
+    if(waitjob.empty()) {
       for (int i = 0; i < n; i++) {
         if (p[i].at >= nowtime && !p[i].visited) {
-          waitProcess.push(p[i]);
+          waitjob.push(p[i]);
           p[i].visited = true;
           nowtime = p[i].at;
           break;
@@ -124,44 +125,44 @@ void SJF(int n, vector<process> p) {
   }
 }
 
-bool comparisionRR(process a, process b) {
+bool comparisionRR(job a, job b) {
   return (a.rr < b.rr);
 }
 
-void HRRN(int n, vector<process> p) {
-  vector<process> waitProcess;
-  process curRun;
+void HRRN(int n, vector<job> p) {
+  vector<job> waitjob;
+  job curRun;
   int nowtime = p[0].at;
   p[0].visited = true;
-  waitProcess.push_back(p[0]);
+  waitjob.push_back(p[0]);
 
   cout << "进程号  进入时间  运行时间  结束运行时间" << endl;
 
-  while (!waitProcess.empty()) {
-    for (int i = 0; i < waitProcess.size(); i++) {
-      waitProcess[i].wt = calculate(waitProcess[i].at, nowtime);
-      waitProcess[i].rr = double((waitProcess[i].wt  +waitProcess[i].bt))/ double(waitProcess[i].bt);
+  while (!waitjob.empty()) {
+    for (int i = 0; i < waitjob.size(); i++) {
+      waitjob[i].wt = calculate(waitjob[i].at, nowtime);
+      waitjob[i].rr = double((waitjob[i].wt  +waitjob[i].bt))/ double(waitjob[i].bt);
     }
-    sort(waitProcess.begin(), waitProcess.end(), comparisionRR);
-    curRun = waitProcess.back();
-    waitProcess.pop_back();
+    sort(waitjob.begin(), waitjob.end(), comparisionRR);
+    curRun = waitjob.back();
+    waitjob.pop_back();
     nowtime = calcTime(nowtime, curRun.bt);
 
-    cout << curRun.jid << "   " << curRun.at << " " << curRun.bt << "  " << nowtime << endl;
+    cout << curRun.jid << "     " << curRun.at << "   " << curRun.bt << "    " << nowtime << endl;
 
 
     for (int i = 0; i < n; i++) {
       if (p[i].at <= nowtime && !p[i].visited) {
         p[i].visited = true;
-        waitProcess.push_back(p[i]);
+        waitjob.push_back(p[i]);
       }
     }
 
-    if(waitProcess.empty()) {
+    if(waitjob.empty()) {
       for (int i = 0; i < n; i++) {
         if (p[i].at >= nowtime && !p[i].visited) {
           p[i].visited = true;
-          waitProcess.push_back(p[i]);
+          waitjob.push_back(p[i]);
           nowtime = p[i].at;
           break;
         }
