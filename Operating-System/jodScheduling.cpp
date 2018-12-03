@@ -21,25 +21,29 @@ typedef struct job {
 void FIFO(int n, vector<job> p);
 void SJF(int n, vector<job> p);
 void HRRN(int n, vector<job> p);
+bool comparisionAt(job a, job b);
 
 int main() {
   vector<job> p(10);
   int n; /* num of jobs */
-  cout << "input the num of jobes: ";
+  cout << "请输入作业数量：";
   cin >> n;
   int i, j; /* count temp; */
 
-  cout << "input the info of job: no, arrival time, burst time, pivilege:" << endl;
+  cout << "输入作业的信息：作业号 到达时间 运行时间" << endl;
   for (i = 0; i < n; i++) {
     cin >> p[i].jid >> p[i].at >> p[i].bt;
     p[i].wt = 0; /* init */
     p[i].rr = 0.0; /* init */
     p[i].visited = false;
   }
+  
   cout << "FIFO:" << endl;
   FIFO(n, p);
+  cout << "------------------" << endl;
   cout << "SJF:" << endl;
   SJF(n, p);
+  cout << "------------------" << endl;
   cout << "HRRN:" << endl;
   HRRN(n, p);
 
@@ -62,7 +66,12 @@ int calculate(int at, int bt) {
   return h * 60 + m;
 }
 
+bool comparisionAt(job a, job b) {
+  return (a.at <= b.at);
+}
+ 
 void FIFO(int n, vector<job> p) {
+  // sort(p.begin(), p.end(), comparisionAt);
   p[0].wt = 0;
   int i;
   // calculate wait time
@@ -71,9 +80,9 @@ void FIFO(int n, vector<job> p) {
     p[i].wt = interval > 0 ? interval : 0;
   }
 
-  cout << "进程号  运行时间  等待时间" << endl;
+  cout << "进程号 运行时间 等待时间" << endl;
   for (i = 0; i < n; i++) {
-    cout << p[i].jid << "  " << p[i].bt << "  " << p[i].wt << endl;
+    printf("%3d %6d %8d \n", p[i].jid,p[i].bt, p[i].wt);
   }
 }
 
@@ -87,7 +96,6 @@ int calcTime(int nowtime, int bt) {
   }
   newMinutue = (bt + nowMinute) % 60;
   return nowHour * 100 + newMinutue;
-
 }
 
 void SJF(int n, vector<job> p) {
@@ -104,7 +112,7 @@ void SJF(int n, vector<job> p) {
     waitjob.pop();
     nowtime = calcTime(nowtime, curRun.bt);
 
-    cout << curRun.jid << "    " << curRun.at << "   " << curRun.bt << "    " << nowtime  << endl;
+    printf("%3d %9d %9d %9d\n",curRun.jid, curRun.at, curRun.bt, nowtime);
     for (int i = 0; i < n; i++) {
       if (p[i].at <= nowtime && !p[i].visited) {
         waitjob.push(p[i]);
@@ -148,7 +156,7 @@ void HRRN(int n, vector<job> p) {
     waitjob.pop_back();
     nowtime = calcTime(nowtime, curRun.bt);
 
-    cout << curRun.jid << "     " << curRun.at << "   " << curRun.bt << "    " << nowtime << endl;
+    printf("%3d %9d %9d %9d\n",curRun.jid, curRun.at, curRun.bt, nowtime);
 
 
     for (int i = 0; i < n; i++) {
