@@ -49,6 +49,7 @@ int main() {
     p[i].has_run = 0;
     p[i].lasttime = p[i].at;
   }
+  /*
   cout << "------------------------------------" << endl;
   cout << "FIFO:" << endl;
   cout << "------------------------------------" << endl;
@@ -66,6 +67,7 @@ int main() {
   cout << "------------------------------------" << endl;
   RR(n, p);
   cout << "------------------------------------" << endl;
+  */
   cout << "FB" << endl;
   cout << "------------------------------------" << endl;
   FB(n, p);
@@ -253,9 +255,9 @@ void RR(int n, vector<process> p) {
       wt = q;
       nowtime = calcTime(nowtime, q);
     } else {
-      curRun.has_run = curRun.bt;
       wt = curRun.bt - curRun.has_run;
       nowtime = calcTime(nowtime, wt);
+      curRun.has_run = curRun.bt;
     }
     
     for (int i = 0; i < n; ++i) {
@@ -298,22 +300,25 @@ void FB(int n, vector<process> p) {
       curRun = q1.front();
       q1.erase(q1.begin());
 
-      if (curRun.bt - curRun.has_run >= p1) {
+      if (curRun.bt - curRun.has_run > p1) {
         curRun.has_run += p1;
         nowtime = calcTime(nowtime, p1);
       } else {
-        curRun.has_run = curRun.bt;
         nowtime = calcTime(nowtime, curRun.bt - curRun.has_run);
+        curRun.has_run = curRun.bt;
       }
       for (int i = 0; i < n; i++) {
         if (!p[i].visited && p[i].at <= nowtime) {
           p[i].visited = true;
           q1.push_back(p[i]);
+          cout << p[i].pid << "进入队列1"<<endl;
         } 
       }
       if (curRun.has_run < curRun.bt) {
+        cout << curRun.pid << "在队列1运行了, 总共还剩" << curRun.bt - curRun.has_run <<"然后移到队列2"<< endl;
         q2.push_back(curRun);
       } else {
+        cout << curRun.pid << "在队列1运行完了"<<endl;
         printf("%3d %6d %9d \n", curRun.pid, curRun.at, curRun.bt);
       }
     }
@@ -321,31 +326,40 @@ void FB(int n, vector<process> p) {
       curRun = q2.front();
       q2.erase(q2.begin());
 
-      if (curRun.bt - curRun.has_run >= p2) {
-        curRun.has_run += p1;
+      int preHasRun = curRun.has_run;
+      if (curRun.bt - curRun.has_run > p2) {
+        curRun.has_run += p2;
         finishtime = calcTime(nowtime, p2);
       } else {
-        curRun.has_run = curRun.bt;
         finishtime = calcTime(nowtime, curRun.bt - curRun.has_run);
+        curRun.has_run = curRun.bt;
       }
 
       for (int i = 0; i < n; i++) {
         if (!p[i].visited && p[i].at <= finishtime) {
           p[i].visited = true;
           q1.push_back(p[i]);
+          cout << p[i].pid << "进入队列1"<<endl;
         }
       }
 
       if (!q1.empty()) {
-        curRun.has_run = curRun.has_run + calculate(nowtime, q1.front().at);
+        if( curRun.has_run < curRun.bt ) {
+          curRun.has_run = preHasRun + calculate(nowtime, q1.front().at);
+        }
         nowtime = q1.front().at;
         q2.push_back(curRun);
+        cout << curRun.pid << "被抢占了，还剩" << curRun.bt - curRun.has_run <<endl;
         continue;
+      } else {
+        nowtime = finishtime;
       }
 
       if (curRun.has_run < curRun.bt) {
+        cout << curRun.pid << "在队列2运行了, 总共还剩" << curRun.bt - curRun.has_run <<"然后移到队列3"<< endl;
         q3.push_back(curRun);
       } else {
+        cout << curRun.pid << "在队列2运行完了"<<endl;
         printf("%3d %6d %9d \n", curRun.pid, curRun.at, curRun.bt);
       }
     }
@@ -354,31 +368,38 @@ void FB(int n, vector<process> p) {
       curRun = q3.front();
       q3.erase(q3.begin());
 
+      int preHasRun = curRun.has_run;
       if (curRun.bt - curRun.has_run >= p3) {
-        curRun.has_run += p1;
+        curRun.has_run += p3;
         finishtime = calcTime(nowtime, p3);
       } else {
-        curRun.has_run = curRun.bt;
         finishtime = calcTime(nowtime, curRun.bt - curRun.has_run);
+        curRun.has_run = curRun.bt;
       }
 
-      nowtime = finishtime;
+      
       for (int i = 0; i < n; i++) {
-        if (!p[i].visited && p[i].at <= nowtime) {
+        if (!p[i].visited && p[i].at <= finishtime) {
           p[i].visited = true;
           q1.push_back(p[i]);
         }
       }
       if (!q1.empty()) {
-        curRun.has_run = curRun.has_run + calculate(nowtime, q1.front().at);
+        if( curRun.has_run < curRun.bt ) {
+          curRun.has_run = preHasRun + calculate(nowtime, q1.front().at);
+        }
         nowtime = q1.front().at;
         q3.push_back(curRun);
         continue;
+      } else {
+        nowtime = finishtime;
       }
 
       if (curRun.has_run < curRun.bt) {
+        cout << curRun.pid << "在队列3运行了, 总共还剩" << curRun.bt - curRun.has_run <<"然后移到队列3"<< endl;
         q3.push_back(curRun);
       } else {
+        cout << curRun.pid << "在队列3运行完了"<<endl;
         printf("%3d %6d %9d \n", curRun.pid, curRun.at, curRun.bt);
       }
 
