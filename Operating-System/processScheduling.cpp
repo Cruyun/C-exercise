@@ -49,7 +49,7 @@ int main() {
     p[i].has_run = 0;
     p[i].lasttime = p[i].at;
   }
-  /*
+
   cout << "------------------------------------" << endl;
   cout << "FIFO:" << endl;
   cout << "------------------------------------" << endl;
@@ -67,7 +67,7 @@ int main() {
   cout << "------------------------------------" << endl;
   RR(n, p);
   cout << "------------------------------------" << endl;
-  */
+
   cout << "FB" << endl;
   cout << "------------------------------------" << endl;
   FB(n, p);
@@ -138,12 +138,22 @@ void highPriority1(int n, vector<process> p) {
     // 计算当前运行的进程预计完成时间
     // 把完成时间以内的其他已经到达的进程 加入就绪队列
     finishtime = calcTime(nowtime, curRun.bt - curRun.has_run);
-    for (int i = 0; i < n; i++) {
-      if (!p[i].visited && p[i].at < finishtime) {
-        p[i].visited = true;
-        waitprocess.push(p[i]);
+    bool flag = false;
+    for (int j = nowtime; j <= finishtime; j++) {
+      for (int i = 0; i < n; i++) {
+        if (!p[i].visited && p[i].at < j) {
+          p[i].visited = true;
+          int k = i;
+          waitprocess.push(p[i]);
+          flag = true;
+          break;
+        }
+      }
+      if (flag) {
+        break;
       }
     }
+
     // 看就绪队列里有没有比当前运行进程的优先级高的
     if (!waitprocess.empty()) {
       // 优先级高的抢占CPU
@@ -259,7 +269,7 @@ void RR(int n, vector<process> p) {
       nowtime = calcTime(nowtime, wt);
       curRun.has_run = curRun.bt;
     }
-    
+
     for (int i = 0; i < n; ++i) {
       if (!p[i].visited && p[i].at <= nowtime) {
         p[i].visited = true;
@@ -270,7 +280,7 @@ void RR(int n, vector<process> p) {
     for (int j = 0; j < waitprocess.size(); ++j) {
       waitprocess[j].wt += wt;
     }
-    
+
     if (curRun.has_run < curRun.bt) {
       waitprocess.push_back(curRun);
     } else {
@@ -311,14 +321,14 @@ void FB(int n, vector<process> p) {
         if (!p[i].visited && p[i].at <= nowtime) {
           p[i].visited = true;
           q1.push_back(p[i]);
-          cout << p[i].pid << "进入队列1"<<endl;
-        } 
+          // cout << p[i].pid << "进入队列1"<<endl;
+        }
       }
       if (curRun.has_run < curRun.bt) {
-        cout << curRun.pid << "在队列1运行了, 总共还剩" << curRun.bt - curRun.has_run <<"然后移到队列2"<< endl;
+        // cout << curRun.pid << "在队列1运行了, 总共还剩" << curRun.bt - curRun.has_run <<"然后移到队列2"<< endl;
         q2.push_back(curRun);
       } else {
-        cout << curRun.pid << "在队列1运行完了"<<endl;
+        // cout << curRun.pid << "在队列1运行完了"<<endl;
         printf("%3d %6d %9d \n", curRun.pid, curRun.at, curRun.bt);
       }
     }
@@ -339,7 +349,7 @@ void FB(int n, vector<process> p) {
         if (!p[i].visited && p[i].at <= finishtime) {
           p[i].visited = true;
           q1.push_back(p[i]);
-          cout << p[i].pid << "进入队列1"<<endl;
+          // cout << p[i].pid << "进入队列1"<<endl;
         }
       }
 
@@ -349,17 +359,17 @@ void FB(int n, vector<process> p) {
         }
         nowtime = q1.front().at;
         q2.push_back(curRun);
-        cout << curRun.pid << "被抢占了，还剩" << curRun.bt - curRun.has_run <<endl;
+        // cout << curRun.pid << "被抢占了，还剩" << curRun.bt - curRun.has_run <<endl;
         continue;
       } else {
         nowtime = finishtime;
       }
 
       if (curRun.has_run < curRun.bt) {
-        cout << curRun.pid << "在队列2运行了, 总共还剩" << curRun.bt - curRun.has_run <<"然后移到队列3"<< endl;
+        // cout << curRun.pid << "在队列2运行了, 总共还剩" << curRun.bt - curRun.has_run <<"然后移到队列3"<< endl;
         q3.push_back(curRun);
       } else {
-        cout << curRun.pid << "在队列2运行完了"<<endl;
+        // cout << curRun.pid << "在队列2运行完了"<<endl;
         printf("%3d %6d %9d \n", curRun.pid, curRun.at, curRun.bt);
       }
     }
@@ -377,7 +387,7 @@ void FB(int n, vector<process> p) {
         curRun.has_run = curRun.bt;
       }
 
-      
+
       for (int i = 0; i < n; i++) {
         if (!p[i].visited && p[i].at <= finishtime) {
           p[i].visited = true;
@@ -396,10 +406,10 @@ void FB(int n, vector<process> p) {
       }
 
       if (curRun.has_run < curRun.bt) {
-        cout << curRun.pid << "在队列3运行了, 总共还剩" << curRun.bt - curRun.has_run <<"然后移到队列3"<< endl;
+        // cout << curRun.pid << "在队列3运行了, 总共还剩" << curRun.bt - curRun.has_run <<"然后移到队列3"<< endl;
         q3.push_back(curRun);
       } else {
-        cout << curRun.pid << "在队列3运行完了"<<endl;
+        // cout << curRun.pid << "在队列3运行完了"<<endl;
         printf("%3d %6d %9d \n", curRun.pid, curRun.at, curRun.bt);
       }
 
