@@ -25,10 +25,12 @@ typedef struct process {
 
 void FIFO(int n, vector<process> p);
 void RR(int n, vector<process> p);
-void highPriority(int n, vector<process> p);
+void highPriority1(int n, vector<process> p);
+void highPriority2(int n, vector<process> p);
 bool compareAt(process a, process b);
 int calculate(int at, int bt);
 int calcTime(int nowtime, int bt);
+void FB(int n, vector<process> p);
 
 int main() {
   vector<process> p(10);
@@ -47,16 +49,26 @@ int main() {
     p[i].has_run = 0;
     p[i].lasttime = p[i].at;
   }
-
+  cout << "------------------------------------" << endl;
   cout << "FIFO:" << endl;
+  cout << "------------------------------------" << endl;
   FIFO(n, p);
-  cout << "------------------" << endl;
-  cout << "highPriority:" << endl;
-  highPriority(n, p);
-  cout << "------------------" << endl;
+  cout << "------------------------------------" << endl;
+  cout << "抢占式 highPriority:" << endl;
+  cout << "------------------------------------" << endl;
+  highPriority1(n, p);
+  cout << "------------------------------------" << endl;
+  cout << "非抢占式 highPriority:" << endl;
+  cout << "------------------------------------" << endl;
+  highPriority2(n, p);
+  cout << "------------------------------------" << endl;
   cout << "RR:" << endl;
+  cout << "------------------------------------" << endl;
   RR(n, p);
-
+  cout << "------------------------------------" << endl;
+  cout << "FB" << endl;
+  cout << "------------------------------------" << endl;
+  FB(n, p);
   return 0;
 }
 
@@ -105,7 +117,7 @@ void FIFO(int n, vector<process> p) {
   printf("平均等待时间为：%.2f\n", float(wtSum / n));
 }
 
-void highPriority(int n, vector<process> p) {
+void highPriority1(int n, vector<process> p) {
   priority_queue<process> waitprocess;
   int wtSum = 0;
   process curRun;
@@ -182,8 +194,47 @@ void highPriority(int n, vector<process> p) {
   printf("平均等待时间为：%.2f\n", float(wtSum / n));
 }
 
+void highPriority2(int n, vector<process> p) {
+  priority_queue<process> waitprocess;
+  process curRun;
+  int nowtime = p[0].at;
+  int wtSum = 0;
+  waitprocess.push(p[0]);
+  p[0].visited = true;
+
+  cout << "进程号  进入时间 运行时间  等待时间" << endl;
+
+  while (!waitprocess.empty()) {
+    curRun = waitprocess.top();
+    waitprocess.pop();
+    nowtime = calcTime(nowtime, curRun.bt);
+    curRun.wt = calculate(curRun.at, nowtime);
+    wtSum += curRun.wt;
+
+    printf("%3d %9d %9d %9d\n",curRun.pid, curRun.at, curRun.bt, curRun.wt);
+    for (int i = 0; i < n; i++) {
+      if (p[i].at <= nowtime && !p[i].visited) {
+        waitprocess.push(p[i]);
+        p[i].visited = true;
+      }
+    }
+
+    if(waitprocess.empty()) {
+      for (int i = 0; i < n; i++) {
+        if (p[i].at >= nowtime && !p[i].visited) {
+          waitprocess.push(p[i]);
+          p[i].visited = true;
+          nowtime = p[i].at;
+          break;
+        }
+      }
+    }
+  }
+  printf("平均等待时间为：%.2f\n", float(wtSum / n));
+}
+
 void RR(int n, vector<process> p) {
-  int q = 10; // 时间片
+  int q = 5; // 时间片
   vector<process> waitprocess;
   vector<process> result;
   int wtSum = 0;
@@ -196,8 +247,17 @@ void RR(int n, vector<process> p) {
     process curRun = waitprocess.front();
     waitprocess.erase(waitprocess.begin());
 
-    nowtime = calcTime(nowtime, q);
-    curRun.has_run += q;
+    int wt = 0;
+    if (curRun.bt - curRun.has_run >= q) {
+      curRun.has_run += q;
+      wt = q;
+      nowtime = calcTime(nowtime, q);
+    } else {
+      curRun.has_run = curRun.bt;
+      wt = curRun.bt - curRun.has_run;
+      nowtime = calcTime(nowtime, wt);
+    }
+    
     for (int i = 0; i < n; ++i) {
       if (!p[i].visited && p[i].at <= nowtime) {
         p[i].visited = true;
@@ -206,8 +266,9 @@ void RR(int n, vector<process> p) {
     }
 //    printf("%3d %6d %9d %9d\n", curRun.pid, curRun.at, curRun.bt, nowtime);
     for (int j = 0; j < waitprocess.size(); ++j) {
-      waitprocess[j].wt += 10;
+      waitprocess[j].wt += wt;
     }
+    
     if (curRun.has_run < curRun.bt) {
       waitprocess.push_back(curRun);
     } else {
@@ -218,4 +279,109 @@ void RR(int n, vector<process> p) {
   }
 
   printf("平均等待时间为：%.2f\n", float(wtSum / n));
+}
+
+void FB(int n, vector<process> p) {
+  vector<process> q1;
+  vector<process> q2;
+  vector<process> q3;
+  int p1 = 5, p2 = 10, p3 = 15;
+  int nowtime = p[0].at;
+  process curRun;
+
+  p[0].visited = true;
+  q1.push_back(p[0]);
+
+  while(!q1.empty() || !q2.empty() || !q3.empty()) {
+    int finishtime = nowtime;
+    if (!q1.empty()) {
+      curRun = q1.front();
+      q1.erase(q1.begin());
+
+      if (curRun.bt - curRun.has_run >= p1) {
+        curRun.has_run += p1;
+        nowtime = calcTime(nowtime, p1);
+      } else {
+        curRun.has_run = curRun.bt;
+        nowtime = calcTime(nowtime, curRun.bt - curRun.has_run);
+      }
+      for (int i = 0; i < n; i++) {
+        if (!p[i].visited && p[i].at <= nowtime) {
+          p[i].visited = true;
+          q1.push_back(p[i]);
+        } 
+      }
+      if (curRun.has_run < curRun.bt) {
+        q2.push_back(curRun);
+      } else {
+        printf("%3d %6d %9d \n", curRun.pid, curRun.at, curRun.bt);
+      }
+    }
+    if (q1.empty() && !q2.empty()) {
+      curRun = q2.front();
+      q2.erase(q2.begin());
+
+      if (curRun.bt - curRun.has_run >= p2) {
+        curRun.has_run += p1;
+        finishtime = calcTime(nowtime, p2);
+      } else {
+        curRun.has_run = curRun.bt;
+        finishtime = calcTime(nowtime, curRun.bt - curRun.has_run);
+      }
+
+      for (int i = 0; i < n; i++) {
+        if (!p[i].visited && p[i].at <= finishtime) {
+          p[i].visited = true;
+          q1.push_back(p[i]);
+        }
+      }
+
+      if (!q1.empty()) {
+        curRun.has_run = curRun.has_run + calculate(nowtime, q1.front().at);
+        nowtime = q1.front().at;
+        q2.push_back(curRun);
+        continue;
+      }
+
+      if (curRun.has_run < curRun.bt) {
+        q3.push_back(curRun);
+      } else {
+        printf("%3d %6d %9d \n", curRun.pid, curRun.at, curRun.bt);
+      }
+    }
+
+    if (q1.empty() && q2.empty() && !q3.empty()) {
+      curRun = q3.front();
+      q3.erase(q3.begin());
+
+      if (curRun.bt - curRun.has_run >= p3) {
+        curRun.has_run += p1;
+        finishtime = calcTime(nowtime, p3);
+      } else {
+        curRun.has_run = curRun.bt;
+        finishtime = calcTime(nowtime, curRun.bt - curRun.has_run);
+      }
+
+      nowtime = finishtime;
+      for (int i = 0; i < n; i++) {
+        if (!p[i].visited && p[i].at <= nowtime) {
+          p[i].visited = true;
+          q1.push_back(p[i]);
+        }
+      }
+      if (!q1.empty()) {
+        curRun.has_run = curRun.has_run + calculate(nowtime, q1.front().at);
+        nowtime = q1.front().at;
+        q3.push_back(curRun);
+        continue;
+      }
+
+      if (curRun.has_run < curRun.bt) {
+        q3.push_back(curRun);
+      } else {
+        printf("%3d %6d %9d \n", curRun.pid, curRun.at, curRun.bt);
+      }
+
+    }
+  }
 }
