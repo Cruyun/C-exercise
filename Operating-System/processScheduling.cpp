@@ -246,7 +246,7 @@ void highPriority2(int n, vector<process> p) {
 }
 
 void RR(int n, vector<process> p) {
-  int q = 5; // 时间片
+  int q = 20; // 时间片
   vector<process> waitprocess;
   vector<process> result;
   int wtSum = 0;
@@ -278,7 +278,12 @@ void RR(int n, vector<process> p) {
     }
 //    printf("%3d %6d %9d %9d\n", curRun.pid, curRun.at, curRun.bt, nowtime);
     for (int j = 0; j < waitprocess.size(); ++j) {
-      waitprocess[j].wt += wt;
+      int interval = calculate(waitprocess[j].at, nowtime);
+      if( interval < wt) {
+        waitprocess[j].wt += interval;
+      } else {
+        waitprocess[j].wt += wt;
+      }
     }
 
     if (curRun.has_run < curRun.bt) {
