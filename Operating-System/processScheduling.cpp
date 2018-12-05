@@ -277,14 +277,6 @@ void RR(int n, vector<process> p) {
       }
     }
 //    printf("%3d %6d %9d %9d\n", curRun.pid, curRun.at, curRun.bt, nowtime);
-    for (int j = 0; j < waitprocess.size(); ++j) {
-      int interval = calculate(waitprocess[j].at, nowtime);
-      if( interval < wt) {
-        waitprocess[j].wt += interval;
-      } else {
-        waitprocess[j].wt += wt;
-      }
-    }
 
     if (curRun.has_run < curRun.bt) {
       waitprocess.push_back(curRun);
