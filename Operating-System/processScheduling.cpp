@@ -15,7 +15,6 @@ typedef struct process {
     int wt; // 等待时间
     int ave_wt; // 平均等待时间
     bool visited;
-    int lasttime;
     int has_run; // 已经运行时间
     bool operator < (const process &a) const
     {
@@ -47,7 +46,6 @@ int main() {
     p[i].status = 1;
     p[i].visited = false;
     p[i].has_run = 0;
-    p[i].lasttime = p[i].at;
   }
 
   cout << "------------------------------------" << endl;
@@ -71,6 +69,7 @@ int main() {
   cout << "FB" << endl;
   cout << "------------------------------------" << endl;
   FB(n, p);
+  
   return 0;
 }
 
@@ -116,7 +115,7 @@ void FIFO(int n, vector<process> p) {
     wtSum += p[i].wt;
     printf("%3d %6d %8d \n", p[i].pid,p[i].bt, p[i].wt);
   }
-  printf("平均等待时间为：%.2f\n", float(wtSum / n));
+  printf("平均等待时间为：%.2f\n", float(wtSum) / float(n));
 }
 
 void highPriority1(int n, vector<process> p) {
@@ -138,59 +137,37 @@ void highPriority1(int n, vector<process> p) {
     // 计算当前运行的进程预计完成时间
     // 把完成时间以内的其他已经到达的进程 加入就绪队列
     finishtime = calcTime(nowtime, curRun.bt - curRun.has_run);
-    bool flag = false;
-    for (int j = nowtime; j <= finishtime; j++) {
+
+    for (int j = nowtime; j < finishtime; j = calcTime(j, 1)) {
       for (int i = 0; i < n; i++) {
         if (!p[i].visited && p[i].at < j) {
           p[i].visited = true;
-          int k = i;
           waitprocess.push(p[i]);
-          flag = true;
-          break;
         }
       }
-      if (flag) {
-        break;
-      }
-    }
 
-    // 看就绪队列里有没有比当前运行进程的优先级高的
-    if (!waitprocess.empty()) {
+      // 看就绪队列里有没有比当前运行进程的优先级高的
+      if (!waitprocess.empty()) {
       // 优先级高的抢占CPU
       // 被抢占的进程放回就绪队列里
-      if (waitprocess.top().priority < curRun.priority) {
-
-        if (waitprocess.top().at > nowtime) {
-          curRun.has_run = waitprocess.top().at - nowtime;
-
-          nowtime = waitprocess.top().at;
-          curRun.lasttime = nowtime;
-        } else {
-          int nexttime = calcTime(nowtime, waitprocess.top().bt - waitprocess.top().has_run);
-          curRun.has_run += calculate(nowtime, nexttime);
-
-          nowtime = calcTime(nowtime, curRun.has_run);
-          curRun.lasttime = nowtime;
-        }
-        waitprocess.push(curRun);
-
-      } else {
-        // 没有：让当前进程进行完，更新当前时间
-        nowtime = finishtime;
+        if (waitprocess.top().priority < curRun.priority) {
+          waitprocess.push(curRun);
+          curRun = waitprocess.top();
+          waitprocess.pop();
+          finishtime = calcTime(nowtime, curRun.bt - curRun.has_run);
+          continue;
+        };
       }
-    } else {
-      nowtime = finishtime;
+      curRun.has_run++;
+      nowtime = j;
     }
 
-
-    if (calculate(curRun.at, nowtime) != curRun.has_run) {
-      curRun.wt = calculate(curRun.lasttime, nowtime) + curRun.wt - (curRun.bt - curRun.has_run);
-    }
-//    printf("%6d %3d %9d %9d %9d %9d\n", nowtime, curRun.pid, curRun.at, curRun.bt, curRun.has_run, curRun.wt);
-    if (calcTime(curRun.at, curRun.bt + curRun.wt) == nowtime) {
+    nowtime = finishtime;
+    // printf("%6d %3d %9d %9d %9d\n", nowtime, curRun.pid, curRun.at, curRun.bt, curRun.has_run);
+      curRun.wt = calculate(curRun.at, nowtime) - curRun.bt;
       wtSum += curRun.wt;
       printf("%3d %9d %9d\n", curRun.pid, curRun.at, curRun.wt);
-    }
+
     // 队列空了但是有未执行的进程
     if(waitprocess.empty()) {
       for (int i = 0; i < n; i++) {
@@ -203,7 +180,7 @@ void highPriority1(int n, vector<process> p) {
       }
     }
   }
-  printf("平均等待时间为：%.2f\n", float(wtSum / n));
+  printf("平均等待时间为：%.2f\n", float(wtSum) / float(n));
 }
 
 void highPriority2(int n, vector<process> p) {
@@ -242,7 +219,7 @@ void highPriority2(int n, vector<process> p) {
       }
     }
   }
-  printf("平均等待时间为：%.2f\n", float(wtSum / n));
+  printf("平均等待时间为：%.2f\n", float(wtSum) / float(n));
 }
 
 void RR(int n, vector<process> p) {
@@ -287,7 +264,7 @@ void RR(int n, vector<process> p) {
     }
   }
 
-  printf("平均等待时间为：%.2f\n", float(wtSum / n));
+  printf("平均等待时间为：%.2f\n", float(wtSum) / float(n));
 }
 
 void FB(int n, vector<process> p) {
@@ -296,11 +273,13 @@ void FB(int n, vector<process> p) {
   vector<process> q3;
   int p1 = 5, p2 = 10, p3 = 15;
   int nowtime = p[0].at;
+  int wtSum = 0;
   process curRun;
 
   p[0].visited = true;
   q1.push_back(p[0]);
 
+  cout << "进程号  进入时间 运行时间 等待时间" << endl;
   while(!q1.empty() || !q2.empty() || !q3.empty()) {
     int finishtime = nowtime;
     if (!q1.empty()) {
@@ -326,7 +305,9 @@ void FB(int n, vector<process> p) {
         q2.push_back(curRun);
       } else {
         // cout << curRun.pid << "在队列1运行完了"<<endl;
-        printf("%3d %6d %9d \n", curRun.pid, curRun.at, curRun.bt);
+        curRun.wt = calculate(curRun.at, nowtime) - curRun.bt;
+        wtSum += curRun.wt;
+        printf("%3d %6d %9d %9d\n", curRun.pid, curRun.at, curRun.bt, curRun.wt);
       }
     }
     if (q1.empty() && !q2.empty()) {
@@ -367,7 +348,9 @@ void FB(int n, vector<process> p) {
         q3.push_back(curRun);
       } else {
         // cout << curRun.pid << "在队列2运行完了"<<endl;
-        printf("%3d %6d %9d \n", curRun.pid, curRun.at, curRun.bt);
+        curRun.wt = calculate(curRun.at, nowtime) - curRun.bt;
+        wtSum += curRun.wt;
+        printf("%3d %6d %9d %9d\n", curRun.pid, curRun.at, curRun.bt, curRun.wt);
       }
     }
 
@@ -407,9 +390,11 @@ void FB(int n, vector<process> p) {
         q3.push_back(curRun);
       } else {
         // cout << curRun.pid << "在队列3运行完了"<<endl;
-        printf("%3d %6d %9d \n", curRun.pid, curRun.at, curRun.bt);
+        curRun.wt = calculate(curRun.at, nowtime) - curRun.bt;
+        wtSum += curRun.wt;
+        printf("%3d %6d %9d %9d\n", curRun.pid, curRun.at, curRun.bt, curRun.wt);
       }
-
     }
   }
+  printf("平均等待时间为：%.2f\n", float(wtSum) / float(n));
 }
