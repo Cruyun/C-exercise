@@ -201,6 +201,7 @@ bool compareAddress(Table a, Table b) {
 }
 
 void show() {
+  sort(freeTable.begin(), freeTable.end(), compareAddress);
   cout << "内存分配情况：" << endl;
   for (int i = 0; i < usedTable.size(); i++) {
     if (usedTable[i].flag != 0) {
@@ -208,7 +209,7 @@ void show() {
     }
   }
   cout << "空闲区：" << endl;
-  for (int j = 0; j < usedTable.size(); j++) {
+  for (int j = 0; j < freeTable.size(); j++) {
     if (freeTable[j].flag != 0) {
       cout << "\t地址：" << setw(4) << freeTable[j].add <<  "  进程空间大小：" << setw(4) <<  freeTable[j].len << endl;
     }
