@@ -100,7 +100,7 @@ bool compareAt(process a, process b) {
 }
 
 void FIFO(int n, vector<process> p) {
-//  sort(p.begin(), p.end(), compareAt);
+  sort(p.begin(), p.end(), compareAt);
   int wtSum = 0;
   p[0].wt = 0;
   int i;
@@ -142,7 +142,7 @@ void highPriority1(int n, vector<process> p) {
       for (int i = 0; i < n; i++) {
         if (!p[i].visited && p[i].at < j) {
           p[i].visited = true;
-          waitprocess.push(p[i]);
+          waitprocess.push(p[i]) ;
         }
       }
 
@@ -225,7 +225,6 @@ void highPriority2(int n, vector<process> p) {
 void RR(int n, vector<process> p) {
   int q = 20; // 时间片
   vector<process> waitprocess;
-  vector<process> result;
   int wtSum = 0;
   p[0].visited = true;
   waitprocess.push_back(p[0]);
