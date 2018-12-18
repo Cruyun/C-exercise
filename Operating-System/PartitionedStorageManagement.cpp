@@ -80,7 +80,7 @@ int WorstFit(int pid, int needlen) {
   while (i < M) {
     if (freeTable[i].flag == 1 && freeTable[i].len >= needlen) {
       cnt++;
-      if (cnt == 1 || freeTable[fitAdd].len > freeTable[i].len ) {
+      if (cnt == 1 || freeTable[fitAdd].len < freeTable[i].len ) {
         fitAdd = i;
       }
     }
@@ -264,6 +264,7 @@ int main() {
         show();
       }
     }
+    cout << "----------------------------------------------------------" << endl;
   }
   return 0;
 }
