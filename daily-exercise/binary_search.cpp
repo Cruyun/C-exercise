@@ -22,7 +22,7 @@ int binary_search(const int arr[], int start, int end, int key) {
             start = mid + 1;
         }
         else if (arr[mid] > key) {
-            start = mid = 1;
+            start = mid - 1;
         }
         else
             return mid;
